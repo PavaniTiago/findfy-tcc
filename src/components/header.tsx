@@ -7,6 +7,9 @@ import { useAuthState } from "react-firebase-hooks/auth"
 import { useRouter } from "next/navigation";
 import SearchBar from "./searchBar";
 import { Bell, UserCircle2Icon } from "lucide-react";
+import Image from "next/image";
+
+import logo from "../../public/logo.png"
 
 export default function Header(){
 
@@ -36,7 +39,7 @@ export default function Header(){
 
     return(
         <header className="w-full h-20 flex items-center bg-[#594694] text-white px-6 py-2">
-            <span className="block">LOGO</span>
+            <Image src={logo} width={200} alt="logo findfy"></Image>
             <div className="flex items-center justify-end w-full gap-6">
                 {session.status === "authenticated" || auth.currentUser ? 
                 <>

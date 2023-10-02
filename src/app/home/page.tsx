@@ -6,6 +6,20 @@ import { auth } from "../firebase";
 import { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth"
 
+import { Swiper, SwiperSlide } from 'swiper/react';
+
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { Navigation, Pagination, Mousewheel, Keyboard, Autoplay } from 'swiper/modules';
+import Image from "next/image";
+
+import banner1 from "../../../public/banner.jpg"
+import banner2 from "../../../public/banner2.jpg"
+import banner3 from "../../../public/banner3.jpg"
+import banner4 from "../../../public/banner4.jpg"
+import banner5 from "../../../public/banner5.jpg"
+
 export default function Home(){
     const session = useSession();
     const router = useRouter();
@@ -20,8 +34,20 @@ export default function Home(){
     return (
         <main className="w-full h-screen bg-gradient-to-br from-[#0e1019] to-purple-300 text-white pb-28">
         <div className="h-full flex flex-col items-center justify-center">    
-        
-      </div>
+          <Swiper
+            slidesPerView={1}
+            autoplay
+            loop={true}
+            modules={[Navigation, Pagination, Autoplay]}
+            className="md:w-[85rem] rounded-3xl"
+          >
+            <SwiperSlide><Image width={2000} src={banner1} alt="banner de filmes" className="h-[30rem] object-cover"></Image></SwiperSlide>
+            <SwiperSlide><Image width={2000} src={banner2} alt="banner de filmes" className="h-[30rem] object-cover"></Image></SwiperSlide>
+            <SwiperSlide><Image width={2000} src={banner3} alt="banner de filmes" className="h-[30rem] object-cover"></Image></SwiperSlide>
+            <SwiperSlide><Image width={2000} src={banner4} alt="banner de filmes" className="h-[30rem] object-cover"></Image></SwiperSlide>
+            <SwiperSlide><Image width={2000} src={banner5} alt="banner de filmes" className="h-[30rem] object-cover"></Image></SwiperSlide>
+          </Swiper>
+        </div>
     </main>
     )
 }
