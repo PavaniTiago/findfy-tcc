@@ -65,12 +65,13 @@ const config: Config = {
         200: '#a7cae6',
         100: '#b9e0ff',
         50: '#c0e3ff',
-      }
+      },
+      custom: 'background: linear-gradient(235deg, rgba(99, 80, 158, 0.98) 45.2%, rgba(7, 7, 7, 0.98) 99.59%)'
     },
     extend: {
       fontFamily:{
         inter: 'Inter, sans-serif'
-      }
+      },
     },
   },
   plugins: [],

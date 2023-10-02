@@ -18,11 +18,9 @@ export default function Home(){
     
 
     return (
-        <main className="w-full h-screen bg-purple-950 text-white pb-28">
+        <main className="w-full h-screen bg-gradient-to-br from-[#0e1019] to-purple-300 text-white pb-28">
         <div className="h-full flex flex-col items-center justify-center">    
-        <h1 className="text-3xl font-bold mb-6">
-            welcome {session.data?.user?.name || user?.email}
-        </h1> 
+        
       </div>
     </main>
     )
