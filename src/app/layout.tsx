@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-br">
-      <body className={`overflow-hidden ${inter.className}`}>
+      <body className={`${inter.className}`}>
         <SessionProvider>
           <Header />
           {children}
