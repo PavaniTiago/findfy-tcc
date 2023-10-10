@@ -61,8 +61,9 @@ export default function Home(){
               640: {
                 slidesPerView: 4,
               },
-              2080: {
+              1420: {
                 slidesPerView: 5,
+                spaceBetween: 20,
               },
             }}
             autoplay
@@ -86,7 +87,7 @@ export default function Home(){
               640: {
                 slidesPerView: 3,
               },
-              2080: {
+              1420: {
                 slidesPerView: 4,
               },
             }}
@@ -119,8 +120,9 @@ export default function Home(){
               640: {
                 slidesPerView: 4,
               },
-              2080: {
+              1420: {
                 slidesPerView: 5,
+                spaceBetween: 20,
               },
             }}
             autoplay
@@ -144,8 +146,9 @@ export default function Home(){
               640: {
                 slidesPerView: 4,
               },
-              2080: {
+              1420: {
                 slidesPerView: 5,
+                spaceBetween: 20,
               },
             }}
             autoplay
@@ -169,8 +172,9 @@ export default function Home(){
               640: {
                 slidesPerView: 4,
               },
-              2080: {
+              1420: {
                 slidesPerView: 5,
+                spaceBetween: 20,
               },
             }}
             autoplay

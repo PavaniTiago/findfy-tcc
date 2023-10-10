@@ -10,6 +10,8 @@ import { Bell, UserCircle2Icon } from "lucide-react";
 import Image from "next/image";
 
 import logo from "../../public/logo.png"
+import { useState } from "react";
+import DropDown from "./dropDown";
 
 export default function Header(){
 
@@ -23,32 +25,29 @@ export default function Header(){
     //     router.push("/")
     // }
 
-    const logOut = async () => {
-        if(session.status === "authenticated"){
-            await signOut()
-            .then(() => {
-                router.push("/")
-            })
-        }else{
-            await auth.signOut()
-            .then(() => {
-                router.push("/")
-            })
-        }
-    }
+    
+    const [open, setOpen] = useState<boolean>(false);
 
     return(
-        <header className="w-full h-20 flex items-center bg-[#594694] text-white px-6 py-2">
+        <header className="w-full relative h-20 flex items-center bg-[#594694] text-white px-6 py-2">
             <Image src={logo} width={200} alt="logo findfy"></Image>
             <div className="flex items-center justify-end w-full gap-6">
                 {session.status === "authenticated" || auth.currentUser ? 
                 <>
-                <div className="mr-12">
+                <div className="flex w-full justify-center">
                 <SearchBar />
                 </div>
                 <button><Bell size={30}/></button>
-                <button><UserCircle2Icon size={30}/></button>
-                <button onClick={logOut} className="flex justify-center items-center md:px-6 px-4 py-1 border border-white rounded-md">Sair</button>
+                <button onClick={() => setOpen(!open)}>
+                    {
+                        open ? 
+               
+                            <DropDown />
+                      
+                        : <div></div>
+                    }
+                    <UserCircle2Icon size={30}/>
+                </button>
                 </>
                 : 
                 <>
