@@ -10,7 +10,7 @@ const config: Config = {
     colors: {
       black: '#080202',
       white: '#F7F7F7', 
-
+      transparent: '#00000000',
       darkPurple: {
         950: '#231d29',
         900: '#2e2737',

@@ -88,7 +88,7 @@ export default function Home(){
                 slidesPerView: 3,
               },
               1420: {
-                slidesPerView: 4,
+                slidesPerView: 3,
               },
             }}
             autoplay
