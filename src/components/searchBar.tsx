@@ -1,10 +1,90 @@
-import { Search } from "lucide-react"
+"use client"
+
+import { MovieProps } from "@/app/interface/movieInterface";
+import axios from "axios";
+import { Clapperboard, Search } from "lucide-react"
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 function SearchBar() {
+  
+  const router = useRouter()
+  const [movie, setMovie] = useState<string>("");
+  const [data, setData] = useState<MovieProps[]>()
+
+    const searchOptions = {
+      method: 'GET',
+      url: 'https://api.themoviedb.org/3/search/movie',
+      params: {query: movie, include_adult: 'false', language: 'pt-BR', page: '1'},
+      headers: {
+        accept: 'application/json',
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_HEADER_KEY}`
+      }
+    };
+
+    const searchFilm = () => {
+      axios
+      .request(searchOptions)
+      .then((response) => {
+        console.log(response.data.results);
+        setData(response.data.results)
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    }
+
+    const searchMovie = (movieId: number) => {
+      const options = {
+        method: 'GET',
+        url: `https://api.themoviedb.org/3/movie/${movieId}`,
+        params: {language: 'pt-BR'},
+        headers: {
+          accept: 'application/json',
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_HEADER_KEY}` 
+        }
+      };
+    
+        axios
+        .request(options)
+        .then((response) => {
+          setData(response.data.results)
+          console.log(response.data);
+        })
+        .catch(function (error) {
+          console.error(error);
+        })
+    }
+
+    useEffect(() => {
+      searchFilm()
+    }, [movie])
+    
   return (
-    <div className="flex relative items-center justify-center md:w-[1024px] rounded-lg md:h-12 bg-purple-100 shadow-xl">
-      <Search size={30} className="absolute pointer-events-none left-4"/>
-        <input type="text" placeholder="descreva o que você deseja assistir" className="placeholder-white pl-20 w-full h-full rounded-lg bg-purple-100 border-0" />
+    <div className="flex flex-col relative items-center justify-center md:w-[1024px] rounded-lg md:h-12 bg-purple-100 shadow-xl z-10 group">
+      <div className="flex w-full h-full relative items-center">
+        <Search size={30} className="absolute pointer-events-none left-4"/>
+        <input type="text" placeholder="descreva o que você deseja assistir" value={movie} onChange={(e) => setMovie(e.target.value)}  className="placeholder-white outline-none pl-20 w-full h-full rounded-lg group-focus-within:bg-purple-700 bg-purple-100 border-0" />
+        <ul className="absolute left-0 top-full bg-purple-200 w-full rounded-lg shadow-2xl space-y-3 mt-1 group-focus-within:block hidden">
+          {data?.map((search) => <Link href={{
+            pathname: "/movie",
+            query: {
+              backdrop_path: search.backdrop_path,
+              title: search.title,
+              overview: search.overview,
+              release_date: search.release_date,
+              vote_average: search.vote_average,
+              id: search.id,
+            }
+          }} 
+          className="flex gap-3 cursor-pointer w-full text-md font-normal px-6 first:pt-4 last:pb-4 hover:underline">
+            <Clapperboard size={20}/>
+            {search.title}
+            </Link>
+          )}
+        </ul>
+      </div>
     </div>
   )
 }
