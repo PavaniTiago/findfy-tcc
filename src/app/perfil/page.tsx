@@ -10,6 +10,10 @@ import { useRouter } from "next/navigation";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../firebase";
 import { useSession } from "next-auth/react";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { TokenProps } from "../interface/token";
+import Link from "next/link";
 
 export default function page() {
 
@@ -17,6 +21,56 @@ export default function page() {
     const [user] = useAuthState(auth)
     const userByProvider = useSession()
     const userAvatar = userByProvider.data?.user?.image as string
+    const [token, setToken] = useState<TokenProps>()
+    const [sessionId, setSessionId] = useState()
+
+    const loginOptions = {
+        method: 'GET',
+        url: 'https://api.themoviedb.org/3/authentication/token/new',
+        headers: {
+            accept: 'application/json',
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_HEADER_KEY}` 
+        }
+    }
+
+    const loginFunc = async () => {
+        try {
+          const response = await axios.request(loginOptions);
+          console.log(response.data);
+          setToken(response.data);
+        }catch (error) {
+            console.error(error);
+        }
+    }
+    
+    useEffect(() => {
+        if(token) {
+            window.open(`https://www.themoviedb.org/authenticate/${token?.request_token}`);
+        }
+    }, [token])
+
+    const createSession = () => {
+        const options = {
+            method: 'POST',
+            url: 'https://api.themoviedb.org/3/authentication/session/new',
+            headers: {
+              accept: 'application/json',
+              'content-type': 'application/json',
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_HEADER_KEY}` 
+            },
+            data: {request_token: token?.request_token}
+        };
+
+          axios
+            .request(options)
+            .then((response) => {
+                console.log(response.data);
+                setSessionId(response.data)
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+    }
     
 
   return (
@@ -47,8 +101,10 @@ export default function page() {
                 <div className="bg-purple-300 h-64 w-4 rounded-2xl"></div>
                 <div className="flex flex-col items-start justify-center gap-4 ml-4">
                     <button className="flex items-center justify-center text-white text-2xl font-semibold gap-4 hover:underline"><Settings size={60}/>Configurações</button>
-                    <button className="flex items-center justify-center text-white text-2xl font-semibold gap-4 hover:underline"><Heart size={60}/>Favoritos</button>
+                    <button className="flex items-center justify-center text-white text-2xl font-semibold gap-4 hover:underline"><Heart size={60}/><Link href={"favorites"}>Favoritos</Link></button>
                     <button className="flex items-center justify-center text-white text-2xl font-semibold gap-4 hover:underline"><BiChat size={60}/>Avaliações e comentários</button>
+                    {/* <button onClick={loginFunc} className="flex items-center justify-center text-white text-2xl font-semibold gap-4 hover:underline"><BiChat size={60}/>clique aqui para favoritar seus filmes e séries!</button>
+                    <button onClick={createSession} className="flex items-center justify-center text-white text-2xl font-semibold gap-4 hover:underline"><BiChat size={60}/>login</button> */}
                 </div>
             </div>
             <div className="flex flex-col gap-4">

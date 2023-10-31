@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import fundo from "../../../public/Imagem.jpg"
-import { AiOutlineHeart } from "react-icons/ai"
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai"
 import { Clock2Icon, LucideArrowLeft, Star, Tv2 } from "lucide-react";
 import { SwiperSlide, Swiper } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
@@ -15,12 +15,14 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { MovieProps } from "../interface/movieInterface";
 import { Genres } from "@/components/genres";
+import Link from "next/link";
 
 export default function page() {
 
   const searchParams = useSearchParams();
   const router = useRouter()
   const [movie, setMovie] = useState<MovieProps[]>()
+  const [favorite, setFavorite] = useState(false)
 
   const poster = searchParams.get("backdrop_path")
   const title = searchParams.get("title")
@@ -52,7 +54,28 @@ export default function page() {
       console.error(error);
     })
   }, [])
-  
+
+  useEffect(() => {
+    const options = {
+      method: 'POST',
+      url: 'https://api.themoviedb.org/3/account/20593585/favorite',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        Authorization:`Bearer ${process.env.NEXT_PUBLIC_HEADER_KEY}`
+      },
+      data: {media_type: 'movie', media_id: movieId, favorite: true}
+    };
+
+    axios
+    .request(options)
+    .then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+  }, [favorite])
   
   return (
     <div className="w-full h-[100%] bg-[#2A2243] relative">
@@ -65,7 +88,9 @@ export default function page() {
             <div className="flex flex-col">
                 <div className="flex items-center gap-4">
                   <h2 className="text-4xl text-white font-semibold">{title}</h2>
-                    <AiOutlineHeart size={35} className="text-white"/>
+                  {
+                    favorite ? <button onClick={() => setFavorite(!true)}><AiFillHeart size={35} className="text-white"/></button> : <button onClick={() => setFavorite(!false)}><AiOutlineHeart size={35} className="text-white"/></button>
+                  }
                     <Star size={30} className="text-white"/>
                     <Star size={30} className="text-white"/>
                     <Star size={30} className="text-white"/>
