@@ -16,6 +16,7 @@ import axios from "axios";
 import { MovieProps } from "../interface/movieInterface";
 import { Genres } from "@/components/genres";
 import Link from "next/link";
+import { StarRating } from "@/components/starRating";
 
 export default function page() {
 
@@ -48,6 +49,8 @@ export default function page() {
     .request(options)
     .then((response) => {
       setMovie(response.data.results)
+      console.log(response.data.results);
+      
       console.log(response.data.genres);
     })
     .catch(function (error) {
@@ -76,6 +79,29 @@ export default function page() {
       console.error(error);
     });
   }, [favorite])
+
+  const handleRatingChange = (newRating: number) => {
+    console.log(`New Rating: ${newRating}`);
+    const options = {
+      method: 'POST',
+      url: `https://api.themoviedb.org/3/movie/${movieId}/rating`,
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json;charset=utf-8',
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_HEADER_KEY}`
+      },
+      data: `{"value":${newRating}}`
+    };
+
+    axios
+      .request(options)
+      .then(function (response) {
+        console.log(response.data);
+      })
+      .catch(function (error) {
+        console.error(error);
+      });
+    };
   
   return (
     <div className="w-full h-[100%] bg-[#2A2243] relative">
@@ -91,11 +117,10 @@ export default function page() {
                   {
                     favorite ? <button onClick={() => setFavorite(!true)}><AiFillHeart size={35} className="text-white"/></button> : <button onClick={() => setFavorite(!false)}><AiOutlineHeart size={35} className="text-white"/></button>
                   }
-                    <Star size={30} className="text-white"/>
-                    <Star size={30} className="text-white"/>
-                    <Star size={30} className="text-white"/>
-                    <Star size={30} className="text-white"/>
-                    <Star size={30} className="text-white"/>
+                    <div className="flex items-center justify-center">
+                      <StarRating totalStars={5} initialRating={0} onRatingChange={handleRatingChange}/>
+                    </div>
+
                 </div>
                 <div className="flex items-center gap-4 mt-3">
                   {movie?.map((search, index) => (

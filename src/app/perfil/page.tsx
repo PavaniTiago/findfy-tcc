@@ -14,6 +14,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { TokenProps } from "../interface/token";
 import Link from "next/link";
+import { MovieProps } from "../interface/movieInterface";
+import { StarRatingDisplay } from "@/components/ratedMovie";
+import { ratedMovieProps } from "../interface/rating";
 
 export default function page() {
 
@@ -23,6 +26,8 @@ export default function page() {
     const userAvatar = userByProvider.data?.user?.image as string
     const [token, setToken] = useState<TokenProps>()
     const [sessionId, setSessionId] = useState()
+    const [latestMovieRated, setLatestMovieRated] = useState<MovieProps[]>()
+    const [movieRating, setMovieRating] = useState<ratedMovieProps[]>();
 
     const loginOptions = {
         method: 'GET',
@@ -43,11 +48,11 @@ export default function page() {
         }
     }
     
-    useEffect(() => {
-        if(token) {
-            window.open(`https://www.themoviedb.org/authenticate/${token?.request_token}`);
-        }
-    }, [token])
+    // useEffect(() => {
+    //     if(token) {
+    //         window.open(`https://www.themoviedb.org/authenticate/${token?.request_token}`);
+    //     }
+    // }, [token])
 
     const createSession = () => {
         const options = {
@@ -72,7 +77,30 @@ export default function page() {
             });
     }
     
-
+    useEffect(() => {
+        const options = {
+            method: 'GET',
+            url: 'https://api.themoviedb.org/3/account/20593585/rated/movies',
+            params: {language: 'en-US', page: '1', sort_by: 'created_at.asc'},
+            headers: {
+              accept: 'application/json',
+              Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiYzRjOTU2ZTYyYzBjMmZkZmFhZjY4MWE2OWEyMDk2NiIsInN1YiI6IjY1MzA2NTBjYWQ1OWI1MDExYzY0YzY2NSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.3yQh0OCcPUw2S4N0hvXy2fAMUeNsrbeXL0SUTt-6xp4'
+            }
+        };
+        
+        axios
+        .request(options)
+        .then((response) => {
+            console.log(response.data);
+            console.log(response.data.results);
+            setLatestMovieRated(response.data.results);
+            setMovieRating(response.data.results);
+        })
+        .catch(function (error) {
+            console.error(error);
+        });  
+    }, [])
+ 
   return (
     <div className="w-full h-screen bg-blue-800 relative">
         <Image alt="user background" src={background} className="bg-cover w-full h-auto rounded-b-3xl opacity-80" sizes="100vw" width={0} height={0}/>
@@ -110,13 +138,13 @@ export default function page() {
             <div className="flex flex-col gap-4">
                 <div className="flex items-center">
                     <h2 className="text-white text-3xl font-semibold ml-4 mr-4">Última avaliação</h2>
-                        <BsStarFill size={30} className="text-white mr-2"/>
-                        <BsStarFill size={30} className="text-white mr-2"/>
-                        <BsStarFill size={30} className="text-white mr-2"/>
-                        <BsStarFill size={30} className="text-white mr-2"/>
-                        <Star size={34} className="text-white"/>
+                    {movieRating?.map((rating) => 
+                    <StarRatingDisplay rating={rating.rating} totalStars={5} />
+                    ).at(-1)}
                 </div>
-                <Image alt="ultima foto curtida" src={banner} className="w-[36rem] bg-cover rounded-3xl shadow-xl"/>
+                {latestMovieRated?.map((movie) => 
+                <Image alt="ultima foto curtida" src={`https://image.tmdb.org/t/p/w500${movie?.backdrop_path}`} width={0} height={0} sizes="100vw" className="w-[36rem] bg-cover rounded-3xl shadow-xl"/>
+                ).at(-1)}
             </div>
         </div>
     </div>
