@@ -1,5 +1,5 @@
-export interface GenresProps {
+export interface GenresProps extends Array<GenresProps> {
     index: number;
     name: string;
-    length: number | undefined;
+    length: number;
 }

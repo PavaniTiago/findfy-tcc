@@ -32,7 +32,7 @@ export default function Header(){
         <header className="w-full z-20 h-20 flex items-center bg-[#594694] text-white px-6 py-2">
             <Image src={logo} width={200} alt="logo findfy"></Image>
             <div className="flex items-center justify-end w-full gap-6">
-                {session.status === "authenticated" || auth.currentUser ? 
+                {session.status === "authenticated" || user ? 
                 <>
                 <div className="flex w-full justify-center">
                 <SearchBar />

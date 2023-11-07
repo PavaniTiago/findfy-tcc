@@ -17,12 +17,14 @@ import { MovieProps } from "../interface/movieInterface";
 import { Genres } from "@/components/genres";
 import Link from "next/link";
 import { StarRating } from "@/components/starRating";
+import { GenresProps } from "../interface/gentes";
 
 export default function page() {
 
   const searchParams = useSearchParams();
   const router = useRouter()
-  const [movie, setMovie] = useState<MovieProps[]>()
+  const [movie, setMovie] = useState<GenresProps[]>()
+  const [time, setTime] = useState(0)
   const [favorite, setFavorite] = useState(false)
 
   const poster = searchParams.get("backdrop_path")
@@ -34,24 +36,46 @@ export default function page() {
 
   const movieId = searchParams.get("id");
 
-  const options = {
-    method: 'GET',
-    url: `https://api.themoviedb.org/3/movie/${movieId}`,
-    params: {language: 'pt-BR'},
-    headers: {
-      accept: 'application/json',
-      Authorization: `Bearer ${process.env.NEXT_PUBLIC_HEADER_KEY}` 
+  function minutesFormater(minutes: number) {
+    if (isNaN(minutes)) {
+      return "Entrada inválida";
     }
-  };
+  
+    const horas = Math.floor(minutes / 60);
+    const minutosRestantes = minutes % 60;
+  
+    const horasPlural = horas === 1 ? "h" : "h";
+    const minutosPlural = minutosRestantes === 1 ? "min" : "min";
+  
+    if (horas > 0 && minutosRestantes > 0) {
+      return `${horas} ${horasPlural} e ${minutosRestantes} ${minutosPlural}`;
+    } else if (horas > 0) {
+      return `${horas} ${horasPlural}`;
+    } else if (minutosRestantes > 0) {
+      return `${minutosRestantes} ${minutosPlural}`;
+    } else {
+      return "0 minutos";
+    }
+  }
 
   useEffect(() => {
+    const options = {
+      method: 'GET',
+      url: `https://api.themoviedb.org/3/movie/${movieId}`,
+      params: {language: 'pt-BR'},
+      headers: {
+        accept: 'application/json',
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_HEADER_KEY}` 
+      }
+    };
     axios
     .request(options)
     .then((response) => {
-      setMovie(response.data.results)
-      console.log(response.data.results);
+      setMovie(response.data.genres)
+      setTime(response.data.runtime)
+      console.log(response.data.runtime);
       
-      console.log(response.data.genres);
+      console.log(response.data);
     })
     .catch(function (error) {
       console.error(error);
@@ -72,9 +96,6 @@ export default function page() {
 
     axios
     .request(options)
-    .then(function (response) {
-      console.log(response.data);
-    })
     .catch(function (error) {
       console.error(error);
     });
@@ -106,16 +127,16 @@ export default function page() {
   return (
     <div className="w-full h-[100%] bg-[#2A2243] relative">
       <div className="relative">
-        <LucideArrowLeft onClick={() => router.push("home")} size={50} className="text-white cursor-pointer absolute top-12 left-8"/>
+        <LucideArrowLeft onClick={() => {router.push("home")}} size={50} className="text-white cursor-pointer absolute top-12 left-8"/>
         <Image alt="fundo do filme" src={`https://image.tmdb.org/t/p/w500${poster}`} priority width={0} height={0} sizes="100vw" className="w-full h-auto"/>
         <div className="absolute bottom-0 h-72 bg-gradient-to-b from-transparent to-[#2A2243] w-full"></div>
       </div>
         <div className="flex items-center px-8 pb-10">
             <div className="flex flex-col">
-                <div className="flex items-center gap-4">
+                <div className="flex items-start gap-4">
                   <h2 className="text-4xl text-white font-semibold">{title}</h2>
                   {
-                    favorite ? <button onClick={() => setFavorite(!true)}><AiFillHeart size={35} className="text-white"/></button> : <button onClick={() => setFavorite(!false)}><AiOutlineHeart size={35} className="text-white"/></button>
+                    favorite ? <button  onClick={() => setFavorite(!true)}><AiFillHeart size={35} className="text-white"/></button> : <button onClick={() => setFavorite(!false)}><AiOutlineHeart size={35} className="text-white"/></button>
                   }
                     <div className="flex items-center justify-center">
                       <StarRating totalStars={5} initialRating={0} onRatingChange={handleRatingChange}/>
@@ -125,14 +146,14 @@ export default function page() {
                 <div className="flex items-center gap-4 mt-3">
                   {movie?.map((search, index) => (
                       <Genres
-                      name={search.genres[0].name} 
-                      length={search.length}
-                      index={index}
+                        name={search.name} 
+                        length={search.length}
+                        index={index}
                       />
                   ))}
                     <span className="text-black font-semibold bg-purple-100 px-3 py-1.5 rounded-2xl flex items-center gap-1">{vote_average}<Star size={25}/></span>
                     <span className="text-black font-semibold bg-purple-100 px-3 py-1.5 rounded-2xl">{release_date}</span>
-                    <span className="flex items-center gap-1 text-black font-semibold bg-purple-100 px-3 py-1.5 rounded-2xl"><Clock2Icon size={20}/> 1hr 59min</span>
+                    <span className="flex items-center gap-1 text-black font-semibold bg-purple-100 px-3 py-1.5 rounded-2xl"><Clock2Icon size={20}/>{minutesFormater(time)}</span>
                 </div>
                 <p className="w-4/6 text-start text-xl text-white font-medium bg-purple-100 px-6 py-4 rounded-2xl mt-6">{overview}</p>
                 <div className="flex items-center gap-4 mt-6">

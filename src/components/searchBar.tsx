@@ -2,16 +2,17 @@
 
 import { MovieProps } from "@/app/interface/movieInterface";
 import axios from "axios";
-import { Clapperboard, Search } from "lucide-react"
+import { child, get, getDatabase, ref, set } from "firebase/database";
+import { Clapperboard, Clock, Search } from "lucide-react"
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 function SearchBar() {
-  
   const router = useRouter()
   const [movie, setMovie] = useState<string>("");
   const [data, setData] = useState<MovieProps[]>()
+  const [recentMovies, setRecentMovies] = useState<MovieProps[]>()
 
     const searchOptions = {
       method: 'GET',
@@ -27,18 +28,19 @@ function SearchBar() {
       axios
       .request(searchOptions)
       .then((response) => {
-        console.log(response.data.results);
         setData(response.data.results)
+        console.log(data);
+        
       })
       .catch((error) => {
         console.error(error);
       });
     }
 
-    const searchMovie = (movieId: number) => {
+    const searchMovie = (id: string) => {
       const options = {
         method: 'GET',
-        url: `https://api.themoviedb.org/3/movie/${movieId}`,
+        url: `https://api.themoviedb.org/3/movie/${id}`,
         params: {language: 'pt-BR'},
         headers: {
           accept: 'application/json',
@@ -49,8 +51,10 @@ function SearchBar() {
         axios
         .request(options)
         .then((response) => {
-          setData(response.data.results)
-          console.log(response.data);
+          const data = [response.data]
+          setRecentMovies(data);
+          console.log(recentMovies);
+          console.log(response.data)
         })
         .catch(function (error) {
           console.error(error);
@@ -58,16 +62,49 @@ function SearchBar() {
     }
 
     useEffect(() => {
-      searchFilm()
+      const dbRef = ref(getDatabase());
+      get(child(dbRef, 'users/recentMovieId')).then((snapshot) => {
+        if (snapshot.exists() && snapshot.val() !== null) {
+          const movieId = snapshot.val();
+          console.log(movieId);
+          searchMovie(movieId);
+        } else {
+          console.log("No data available");
+        }
+        searchFilm()
+      })
     }, [movie])
+
+    const setRecentMovie = (id: string) => {
+      const db = getDatabase()
+      set(ref(db, `users/recentMovieId`), id)
+    }
     
   return (
     <div className="flex flex-col relative items-center justify-center md:w-[1024px] rounded-lg md:h-12 bg-purple-100 shadow-xl z-10 group">
       <div className="flex w-full h-full relative items-center">
         <Search size={30} className="absolute pointer-events-none left-4"/>
-        <input type="text" placeholder="descreva o que você deseja assistir" value={movie} onChange={(e) => setMovie(e.target.value)}  className="placeholder-white outline-none pl-20 w-full h-full rounded-lg group-focus-within:bg-purple-700 bg-purple-100 border-0" />
+        <input type="text" placeholder="descreva o que você deseja assistir" 
+        value={movie} onChange={(e) => setMovie(e.target.value)} 
+        className="placeholder-white outline-none pl-20 w-full h-full rounded-lg group-focus-within:bg-purple-700 bg-purple-100 border-0" />
+            
         <ul className="absolute left-0 top-full bg-purple-200 w-full rounded-lg shadow-2xl space-y-3 mt-1 group-focus-within:block hidden">
-          {data?.map((search) => <Link href={{
+        {recentMovies?.map((movie) => (
+                <Link href={{
+                  pathname: "/movie",
+                  query: {
+                    backdrop_path: movie?.backdrop_path,
+                    title: movie?.title,
+                    overview: movie?.overview,
+                    release_date: movie?.release_date,
+                    vote_average: movie?.vote_average,
+                    id: movie?.id,
+                  }
+                }}  className="flex gap-3 cursor-pointer items-center w-full text-md font-normal px-6 first:pt-4 last:pb-4 hover:underline"><Clock size={20}/> {movie?.title}</Link>
+              ))}
+         
+          {data?.map((search) => 
+          <Link onClick={() => setRecentMovie(search.id)} href={{
             pathname: "/movie",
             query: {
               backdrop_path: search.backdrop_path,
@@ -83,7 +120,7 @@ function SearchBar() {
             {search.title}
             </Link>
           )}
-        </ul>
+          </ul>
       </div>
     </div>
   )

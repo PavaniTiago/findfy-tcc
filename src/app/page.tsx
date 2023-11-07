@@ -45,7 +45,6 @@ export default function Home() {
   return (
     <main className="w-full h-screen bg-purple-950 text-white pb-28">
       <div className="h-full flex flex-col items-center justify-center">
-        <span>Logo</span>
         <h1 className="text-3xl font-bold mb-6">
           Sing in to FindFy
         </h1>
@@ -56,9 +55,14 @@ export default function Home() {
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} name="password" placeholder="insira sua senha" className="bg-purple-950 rounded px-3 py-2 shadow-lg"/>
           <button type="submit" className="w-full bg-white hover:bg-white/90 text-black rounded py-1.5 text-md font-semibold mt-4 mb-2 shadow-lg">Entrar</button>
           {error && <span>{error}</span>}
-          <div className="flex self-center space-x-8">
-            <button className="w-20 flex items-center justify-center mt-3 bg-white hover:bg-white/90 rounded text-black py-1" onClick={() => signIn('google')}><BiLogoGoogle className="w-6 h-6"/></button>
-            <button className="w-20 flex items-center justify-center mt-3 bg-white hover:bg-white/90 rounded text-black py-1"><BsMicrosoft className="w-5 h-5"/></button>
+          <div className="flex items-center justify-center gap-3">
+            <div className="w-28 h-[0.1px] bg-white/60"></div>
+            <p className="text-white/60">ou</p>
+            <div className="w-28 h-[0.1px] bg-white/60"></div>
+          </div>
+          <div className="flex self-center w-full space-x-8">
+            <button className="w-full flex items-center justify-center mt-3 bg-white hover:bg-white/90 rounded text-black py-1" onClick={() => signIn('google')}><BiLogoGoogle className="w-6 h-6"/></button>
+            {/* <button className="w-20 flex items-center justify-center mt-3 bg-white hover:bg-white/90 rounded text-black py-1" onClick={() => signIn('microsoft')}><BsMicrosoft className="w-5 h-5"/></button> */}
           </div>
           <Link href="/cadastro" className="flex text-sm text-white/70 hover:text-white hover:underline self-center mt-3">Não tem uma conta ainda? crie agora.</Link>
         </form>

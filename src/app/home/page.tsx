@@ -41,14 +41,13 @@ export default function Home(){
           accept: 'application/json',
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_HEADER_KEY}`
         }
-      };
-      
+      }; 
+
       useEffect(() => {
         axios
-          .request(options)
-          .then(res => {
-            setMovie(res.data.results);
-            console.log(res.data.results);
+        .request(options)
+        .then(res => {
+          setMovie(res.data.results);
           })
           .catch(error => {
             console.error("Error fetching data:", error);
@@ -78,7 +77,7 @@ export default function Home(){
                     id: poster.id,
                   }
                 }}>
-              <Image id={poster?.id} priority loading="eager" width={0} src={`https://image.tmdb.org/t/p/w500${poster?.backdrop_path}`} height={0} sizes="100vw" alt="banner de filmes" className="h-[30rem] w-full object-cover"></Image>
+              <Image id={poster?.id} priority width={0} src={`https://image.tmdb.org/t/p/w500${poster?.backdrop_path}`} height={0} sizes="100vw" alt="banner de filmes" className="h-[30rem] w-full object-cover"></Image>
                 </Link>
             </SwiperSlide>
             </>
