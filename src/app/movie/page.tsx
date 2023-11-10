@@ -13,11 +13,11 @@ import Actor from "@/components/actor";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { MovieProps } from "../interface/movieInterface";
 import { Genres } from "@/components/genres";
-import Link from "next/link";
 import { StarRating } from "@/components/starRating";
 import { GenresProps } from "../interface/gentes";
+import { useMyContext } from "../context/context";
+import { getDatabase, set, ref, push, get } from "firebase/database";
 
 export default function page() {
 
@@ -32,10 +32,10 @@ export default function page() {
   const overview = searchParams.get("overview")
   const release_date = searchParams.get("release_date")
   const vote_average = searchParams.get("vote_average")
-  const genresName = searchParams.get("genres")
-
   const movieId = searchParams.get("id");
 
+  const { minhaVariavel, setMinhaVariavel } = useMyContext()
+  
   function minutesFormater(minutes: number) {
     if (isNaN(minutes)) {
       return "Entrada inválida";
@@ -73,9 +73,6 @@ export default function page() {
     .then((response) => {
       setMovie(response.data.genres)
       setTime(response.data.runtime)
-      console.log(response.data.runtime);
-      
-      console.log(response.data);
     })
     .catch(function (error) {
       console.error(error);
@@ -94,35 +91,62 @@ export default function page() {
       data: {media_type: 'movie', media_id: movieId, favorite: true}
     };
 
+    
     axios
     .request(options)
     .catch(function (error) {
       console.error(error);
     });
   }, [favorite])
+  
+  const setFavoriteMovie = async (id: string | null) => {
+    const db = getDatabase();
+    const favoritesRef = ref(db, `users/${minhaVariavel}/favoritesMovies`);
 
-  const handleRatingChange = (newRating: number) => {
-    console.log(`New Rating: ${newRating}`);
-    const options = {
-      method: 'POST',
-      url: `https://api.themoviedb.org/3/movie/${movieId}/rating`,
-      headers: {
-        accept: 'application/json',
-        'Content-Type': 'application/json;charset=utf-8',
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_HEADER_KEY}`
-      },
-      data: `{"value":${newRating}}`
-    };
+    try {
+      const snapshot = await get(favoritesRef);
+      const currentFavorites = snapshot.val() || [];
 
-    axios
-      .request(options)
-      .then(function (response) {
-        console.log(response.data);
-      })
-      .catch(function (error) {
-        console.error(error);
-      });
-    };
+      if (!currentFavorites.includes(movieId)) {
+        const updatedFavorites = [...currentFavorites, id];
+        await set(favoritesRef, updatedFavorites);
+
+        console.log(`O filme com ID ${movieId} foi adicionado aos favoritos do usuário.`);
+      } else {
+        console.log(`O filme com ID ${movieId} já está na lista de favoritos.`);
+      }
+    } catch (error: any) {
+      console.error('Erro ao adicionar filme aos favoritos:', error.message);
+    }
+  }
+
+  const handleRatingChange = async (newRating: number) => {
+    if (!movieId) {
+      console.error('O movieId não está definido.');
+      return;
+    }
+  
+    console.log(`New Rating for movie ID ${movieId}: ${newRating}`);
+    const db = getDatabase();
+    const ratingsRef = ref(db, `users/${minhaVariavel}/lastRatedMovie`);
+  
+    try {
+      const snapshot = await get(ratingsRef);
+      const currentRatedMovies = snapshot.val() || {};
+  
+      // Adiciona a nova classificação ao filme correspondente no objeto
+  
+      // Salva o objeto atualizado no banco de dados
+      await set(ratingsRef, {stars: newRating, id: movieId});
+  
+      console.log(`Avaliação para o filme com ID ${movieId} foi salva.`);
+    } catch (error: any) {
+      console.error('Erro ao adicionar avaliação ao filme:', error.message);
+    }
+  };
+  
+  
+  
   
   return (
     <div className="w-full h-[100%] bg-[#2A2243] relative">
@@ -136,7 +160,7 @@ export default function page() {
                 <div className="flex items-start gap-4">
                   <h2 className="text-4xl text-white font-semibold">{title}</h2>
                   {
-                    favorite ? <button  onClick={() => setFavorite(!true)}><AiFillHeart size={35} className="text-white"/></button> : <button onClick={() => setFavorite(!false)}><AiOutlineHeart size={35} className="text-white"/></button>
+                    favorite ? <button  onClick={() => {setFavorite(!true)}}><AiFillHeart size={35} className="text-white"/></button> : <button onClick={() => {setFavorite(!false); setFavoriteMovie(movieId)}}><AiOutlineHeart size={35} className="text-white"/></button>
                   }
                     <div className="flex items-center justify-center">
                       <StarRating totalStars={5} initialRating={0} onRatingChange={handleRatingChange}/>

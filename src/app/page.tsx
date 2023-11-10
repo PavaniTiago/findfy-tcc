@@ -10,24 +10,26 @@ import { SyntheticEvent, useState } from "react";
 import { auth } from "./firebase";
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { useAuthState } from "react-firebase-hooks/auth"
+import { useMyContext } from "./context/context";
 
 
 export default function Home() {
 
+  const { minhaVariavel } = useMyContext() 
+  console.log(minhaVariavel)
+  const router = useRouter();
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
 
-  const router = useRouter();
   const session = useSession();
   const [user] = useAuthState(auth)
 
   if(session.status === "authenticated"){
     router.push("/home")
   }
-
   const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
-
+  
   async function signin(e: SyntheticEvent) {
     e.preventDefault();
 

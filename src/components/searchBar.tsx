@@ -1,5 +1,6 @@
 "use client"
 
+import { useMyContext } from "@/app/context/context";
 import { MovieProps } from "@/app/interface/movieInterface";
 import axios from "axios";
 import { child, get, getDatabase, ref, set } from "firebase/database";
@@ -14,6 +15,8 @@ function SearchBar() {
   const [data, setData] = useState<MovieProps[]>()
   const [recentMovies, setRecentMovies] = useState<MovieProps[]>()
 
+  const { minhaVariavel } = useMyContext()
+  
     const searchOptions = {
       method: 'GET',
       url: 'https://api.themoviedb.org/3/search/movie',
@@ -28,56 +31,61 @@ function SearchBar() {
       axios
       .request(searchOptions)
       .then((response) => {
-        setData(response.data.results)
-        console.log(data);
-        
+        setData(response.data.results)        
       })
       .catch((error) => {
         console.error(error);
       });
     }
 
-    const searchMovie = (id: string) => {
+    const searchMovies = (ids: string[]) => {
       const options = {
         method: 'GET',
-        url: `https://api.themoviedb.org/3/movie/${id}`,
-        params: {language: 'pt-BR'},
+        url: 'https://api.themoviedb.org/3/movie',
+        params: { language: 'pt-BR', append_to_response: 'videos' },
         headers: {
           accept: 'application/json',
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_HEADER_KEY}` 
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_HEADER_KEY}`
         }
       };
     
-        axios
-        .request(options)
-        .then((response) => {
-          const data = [response.data]
-          setRecentMovies(data);
-          console.log(recentMovies);
-          console.log(response.data)
-        })
+      const movieRequests = ids.map((id) => {
+        return axios.request({ ...options, url: `${options.url}/${id}` });
+      });
+    
+      axios
+        .all(movieRequests)
+        .then(axios.spread((...responses) => {
+          const moviesData = responses.map((response) => response.data);
+          setRecentMovies(moviesData);
+          console.log(moviesData);
+        }))
         .catch(function (error) {
           console.error(error);
-        })
-    }
-
+        });
+    };
+    
     useEffect(() => {
       const dbRef = ref(getDatabase());
-      get(child(dbRef, 'users/recentMovieId')).then((snapshot) => {
+      get(child(dbRef, `users/${minhaVariavel}/movieIds`)).then((snapshot) => {
         if (snapshot.exists() && snapshot.val() !== null) {
-          const movieId = snapshot.val();
-          console.log(movieId);
-          searchMovie(movieId);
+          const movieIds = snapshot.val();
+          searchMovies(movieIds);
         } else {
           console.log("No data available");
         }
-        searchFilm()
-      })
-    }, [movie])
+        searchFilm() 
+      });
+    }, [movie]);
+    
 
-    const setRecentMovie = (id: string) => {
+    const setRecentMovie = async (id: string) => {
       const db = getDatabase()
-      set(ref(db, `users/recentMovieId`), id)
+      const userRef = ref(db, `users/${minhaVariavel}/`)
+      const moviesRef = child(userRef, 'movieIds');
+      const currentMovieIds = (await get(moviesRef)).val() || [];
+      currentMovieIds.push(id);
+      set(moviesRef, currentMovieIds);
     }
     
   return (

@@ -17,6 +17,8 @@ import Link from "next/link";
 import { MovieProps } from "../interface/movieInterface";
 import { StarRatingDisplay } from "@/components/ratedMovie";
 import { ratedMovieProps } from "../interface/rating";
+import { get, getDatabase, ref, set } from "firebase/database";
+import { useMyContext } from "../context/context";
 
 export default function page() {
 
@@ -26,81 +28,49 @@ export default function page() {
     const userAvatar = userByProvider.data?.user?.image as string
     const [token, setToken] = useState<TokenProps>()
     const [sessionId, setSessionId] = useState()
-    const [latestMovieRated, setLatestMovieRated] = useState<MovieProps[]>()
-    const [movieRating, setMovieRating] = useState<ratedMovieProps[]>();
-
-    const loginOptions = {
-        method: 'GET',
-        url: 'https://api.themoviedb.org/3/authentication/token/new',
-        headers: {
-            accept: 'application/json',
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_HEADER_KEY}` 
-        }
-    }
-
-    const loginFunc = async () => {
-        try {
-          const response = await axios.request(loginOptions);
-          console.log(response.data);
-          setToken(response.data);
-        }catch (error) {
-            console.error(error);
-        }
-    }
+    const [latestMovieRated, setLatestMovieRated] = useState<any[]>([])
+    const [movieRating, setMovieRating] = useState<number>(0);
     
-    // useEffect(() => {
-    //     if(token) {
-    //         window.open(`https://www.themoviedb.org/authenticate/${token?.request_token}`);
-    //     }
-    // }, [token])
-
-    const createSession = () => {
+    const { minhaVariavel } = useMyContext()
+    
+    const getMoviebyId = (id: string) => {
         const options = {
-            method: 'POST',
-            url: 'https://api.themoviedb.org/3/authentication/session/new',
+            method: 'GET',
+            url: `https://api.themoviedb.org/3/movie/${id}`,
+            params: {language: 'pt-BR'},
             headers: {
               accept: 'application/json',
-              'content-type': 'application/json',
               Authorization: `Bearer ${process.env.NEXT_PUBLIC_HEADER_KEY}` 
-            },
-            data: {request_token: token?.request_token}
-        };
-
+            }
+          };
           axios
-            .request(options)
-            .then((response) => {
-                console.log(response.data);
-                setSessionId(response.data)
-            })
-            .catch(function (error) {
-                console.error(error);
-            });
+          .request(options)
+          .then((response) => {
+            setLatestMovieRated(response.data)
+            console.log(response.data)
+          })
+          .catch(function (error) {
+            console.error(error);
+          })
     }
     
     useEffect(() => {
-        const options = {
-            method: 'GET',
-            url: 'https://api.themoviedb.org/3/account/20593585/rated/movies',
-            params: {language: 'en-US', page: '1', sort_by: 'created_at.asc'},
-            headers: {
-              accept: 'application/json',
-              Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiYzRjOTU2ZTYyYzBjMmZkZmFhZjY4MWE2OWEyMDk2NiIsInN1YiI6IjY1MzA2NTBjYWQ1OWI1MDExYzY0YzY2NSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.3yQh0OCcPUw2S4N0hvXy2fAMUeNsrbeXL0SUTt-6xp4'
-            }
-        };
+        const getLastRated = async () => {
+            const db = getDatabase()
+            const userRef = ref(db, `users/${minhaVariavel}/lastRatedMovie`)
         
-        axios
-        .request(options)
-        .then((response) => {
-            console.log(response.data);
-            console.log(response.data.results);
-            setLatestMovieRated(response.data.results);
-            setMovieRating(response.data.results);
-        })
-        .catch(function (error) {
-            console.error(error);
-        });  
+            try {
+                const snapshot = (await get(userRef)).val();
+                setLatestMovieRated(snapshot)
+                setMovieRating(snapshot.stars)
+                getMoviebyId(snapshot.id)
+              } catch (error: any) {
+                console.error('Erro ao adicionar filme aos favoritos:', error.message);
+              }
+        }
+        getLastRated()
     }, [])
- 
+    
   return (
     <div className="w-full h-screen bg-blue-800 relative">
         <Image alt="user background" src={background} className="bg-cover w-full h-auto rounded-b-3xl opacity-80" sizes="100vw" width={0} height={0}/>
@@ -138,11 +108,9 @@ export default function page() {
             <div className="flex flex-col gap-4">
                 <div className="flex items-center">
                     <h2 className="text-white text-3xl font-semibold ml-4 mr-4">Última avaliação</h2>
-                    {movieRating?.map((rating) => 
-                    <StarRatingDisplay rating={rating.rating} totalStars={5} />
-                    ).at(-1)}
+                    <StarRatingDisplay rating={movieRating} totalStars={5} />
                 </div>
-                {latestMovieRated?.map((movie) => 
+                {[latestMovieRated]?.map((movie: any) => 
                 <Image alt="ultima foto curtida" src={`https://image.tmdb.org/t/p/w500${movie?.backdrop_path}`} width={0} height={0} sizes="100vw" className="w-[36rem] bg-cover rounded-3xl shadow-xl"/>
                 ).at(-1)}
             </div>
