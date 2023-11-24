@@ -1,4 +1,4 @@
-import { Heart } from "lucide-react";
+import { Heart, Star } from "lucide-react";
 import Image, { StaticImageData } from "next/image"
 import { useState } from "react";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai"
@@ -7,9 +7,8 @@ interface RecomendacaoProps {
     image: StaticImageData | string;
     description: string;
     episodes: string;
-    temps: string;
 }
-export default function Recomendacao({ image, description, episodes, temps }: RecomendacaoProps) {
+export default function Recomendacao({ image, description, episodes }: RecomendacaoProps) {
 
     const [liked, setLiked] = useState<boolean>(false)
 
@@ -20,8 +19,7 @@ export default function Recomendacao({ image, description, episodes, temps }: Re
               <h2 className="text-white font-extrabold text-3xl text-center mb-8">Recomendação do dia</h2>
               <p className="text-white text-xl pb-4">{description}</p>
                 <div className="flex gap-12">
-                    <span className="text-white font-bold text-3xl bg-purple-100 py-3 px-12 rounded-xl text-center shadow-lg">{episodes}</span>
-                    <span className="text-white font-bold text-3xl bg-purple-100 py-3 px-12 rounded-xl text-center shadow-lg">{temps}T</span>
+                    <span className="text-white font-bold text-3xl bg-purple-100 py-3 px-12 rounded-xl text-center shadow-lg flex gap-3">{episodes}<Star size={35}/></span>
                     {
                         liked ? <button className="border-0" onClick={() => setLiked(false)}><AiFillHeart size={55}/></button> 
                         : <button className="border-0" onClick={() => setLiked(true)}><AiOutlineHeart size={55}/></button>

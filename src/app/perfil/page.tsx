@@ -98,9 +98,9 @@ export default function page() {
             <div className="flex">
                 <div className="bg-purple-300 h-64 w-4 rounded-2xl"></div>
                 <div className="flex flex-col items-start justify-center gap-4 ml-4">
-                    <button className="flex items-center justify-center text-white text-2xl font-semibold gap-4 hover:underline"><Settings size={60}/>Configurações</button>
+                    {/* <button className="flex items-center justify-center text-white text-2xl font-semibold gap-4 hover:underline"><Settings size={60}/>Configurações</button> */}
                     <button className="flex items-center justify-center text-white text-2xl font-semibold gap-4 hover:underline"><Heart size={60}/><Link href={"favorites"}>Favoritos</Link></button>
-                    <button className="flex items-center justify-center text-white text-2xl font-semibold gap-4 hover:underline"><BiChat size={60}/>Avaliações e comentários</button>
+                    {/* <button className="flex items-center justify-center text-white text-2xl font-semibold gap-4 hover:underline"><BiChat size={60}/>Avaliações e comentários</button> */}
                     {/* <button onClick={loginFunc} className="flex items-center justify-center text-white text-2xl font-semibold gap-4 hover:underline"><BiChat size={60}/>clique aqui para favoritar seus filmes e séries!</button>
                     <button onClick={createSession} className="flex items-center justify-center text-white text-2xl font-semibold gap-4 hover:underline"><BiChat size={60}/>login</button> */}
                 </div>

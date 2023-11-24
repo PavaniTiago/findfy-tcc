@@ -26,12 +26,15 @@ import CategoriasFilmes from "@/components/categoriasFilmes";
 import Recomendacao from "@/components/recomendação";
 import { MovieProps } from "../interface/movieInterface";
 import Link from "next/link";
+import { getDatabase, ref, set } from "firebase/database";
+import { useMyContext } from "../context/context";
 
 export default function Home(){
     const session = useSession();
     const router = useRouter();
-    const [user] = useAuthState(auth)
     const [movie, setMovie] = useState<MovieProps[]>()
+    const [user] = useAuthState(auth)
+    const { setMinhaVariavel } = useMyContext()
 
       const options = {
         method: 'GET',
@@ -119,31 +122,6 @@ export default function Home(){
             )}
           </Swiper>
           </div>
-          <div className="flex flex-col w-full mx-0 self-start px-14 mt-36">
-            <h2 className="text-white font-extrabold text-3xl">Categorias de filmes e séries</h2>
-            <Swiper
-            breakpoints={{
-              640: {
-                slidesPerView: 3,
-              },
-              1420: {
-                slidesPerView: 3,
-              },
-            }}
-            autoplay
-            loop={true}
-            modules={[Navigation, Pagination, Autoplay]}
-            className="w-full mt-14 self-start"
-          >
-            <SwiperSlide className="mr-8"><CategoriasFilmes img={banner1} title="romance"/></SwiperSlide>
-            <SwiperSlide className="mr-8"><CategoriasFilmes img={banner1} title="romance"/></SwiperSlide>
-            <SwiperSlide className="mr-8"><CategoriasFilmes img={banner1} title="romance"/></SwiperSlide>
-            <SwiperSlide className="mr-8"><CategoriasFilmes img={banner1} title="romance"/></SwiperSlide>
-            <SwiperSlide className="mr-8"><CategoriasFilmes img={banner1} title="romance"/></SwiperSlide>
-            <SwiperSlide className="mr-8"><CategoriasFilmes img={banner1} title="romance"/></SwiperSlide>
-            <SwiperSlide className="mr-8"><CategoriasFilmes img={banner1} title="romance"/></SwiperSlide>
-          </Swiper>
-          </div>
           <div className="mt-32"> 
             {movie?.map((movie) => 
             <Link href={{
@@ -161,12 +139,11 @@ export default function Home(){
                 image={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
                 description={movie.overview}
                 episodes={movie.vote_average}
-                temps={movie.runtime}
               />
             </Link>
           ).at(Math.floor(Math.random() * movie?.length))}
           </div>
-          <div className="flex flex-col w-full mx-0 self-start px-14 mt-36">
+          {/* <div className="flex flex-col w-full mx-0 self-start px-14 mt-36">
             <h2 className="text-white font-extrabold text-3xl">Filmes e séries recomendados</h2>
             <Swiper
             breakpoints={{
@@ -243,7 +220,7 @@ export default function Home(){
             <SwiperSlide className=""><Image width={0} src={banner6} alt="banner de filmes" className="h-[405.131px] w-[306.22px] rounded-3xl object-cover"></Image></SwiperSlide>
             <SwiperSlide className=""><Image width={0} src={banner7} alt="banner de filmes" className="h-[405.131px] w-[306.22px] rounded-3xl object-cover"></Image></SwiperSlide>
           </Swiper>
-          </div>
+          </div> */}
         </div>
     </main>
     )

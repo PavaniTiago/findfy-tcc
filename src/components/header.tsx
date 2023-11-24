@@ -30,15 +30,14 @@ export default function Header(){
 
     return(
         <header className="w-full z-20 h-20 flex items-center bg-[#594694] text-white px-6 py-2">
-            <Image src={logo} width={200} alt="logo findfy"></Image>
+            <Image src={logo} className="w-40 mt-5" width={0} alt="logo findfy" sizes="100vw" priority></Image>
             <div className="flex items-center justify-end w-full gap-6">
                 {session.status === "authenticated" || user ? 
                 <>
                 <div className="flex w-full justify-center">
                 <SearchBar />
                 </div>
-                <button><Bell size={30}/></button>
-                <button onClick={() => setOpen(!open)}>
+                <button className="mr-4" onClick={() => setOpen(!open)}>
                     {
                         open ? 
                

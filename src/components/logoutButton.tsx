@@ -1,5 +1,6 @@
 'use client'
 
+import { useMyContext } from "@/app/context/context";
 import { auth } from "@/app/firebase";
 import { LogOut } from "lucide-react";
 import { useSession, signOut  } from "next-auth/react";
@@ -8,17 +9,20 @@ import { useRouter } from "next/navigation";
 export default function LogoutButton() {
     const router = useRouter()
     const session = useSession()
+    const { setMinhaVariavel } = useMyContext()
 
     const logOut = async () => {
         if(session.status === "authenticated"){
             await signOut()
             .then(() => {
                 router.push("/")
+                setMinhaVariavel("")
             })
         }else{
             await auth.signOut()
             .then(() => {
                 router.push("/")
+                setMinhaVariavel("")
             })
         }
     }

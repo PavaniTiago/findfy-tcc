@@ -15,10 +15,6 @@ interface MyContextProviderProps {
 export const MyContextProvider: FC<MyContextProviderProps> = ({ children }) => {
   const [minhaVariavel, setMinhaVariavel] = useState('');
 
-  useEffect(() => {
-    console.log('Context - minhaVariavel:', minhaVariavel);
-  }, [minhaVariavel]);
-
   if (process.env.NODE_ENV !== 'production' && typeof window === 'undefined') {
     console.warn('MyContextProvider is being used outside of a browser environment. Make sure to use it within a component tree.');
   }
@@ -48,8 +44,6 @@ export const MyContextProvider: FC<MyContextProviderProps> = ({ children }) => {
 
 export const useMyContext = (): MyContextType => {
   const context = useContext(MyContext);
-
-  console.log('useMyContext - context:', context);
 
   return context || { minhaVariavel: '', setMinhaVariavel: () => {} };
 };

@@ -180,38 +180,11 @@ export default function page() {
                     <span className="flex items-center gap-1 text-black font-semibold bg-purple-100 px-3 py-1.5 rounded-2xl"><Clock2Icon size={20}/>{minutesFormater(time)}</span>
                 </div>
                 <p className="w-4/6 text-start text-xl text-white font-medium bg-purple-100 px-6 py-4 rounded-2xl mt-6">{overview}</p>
-                <div className="flex items-center gap-4 mt-6">
+                {/* <div className="flex items-center gap-4 mt-6">
                     <Tv2 size={35} className="text-white"/>
                     <span className="flex items-center gap-1 text-black font-semibold bg-purple-100 px-3 py-1.5 rounded-2xl">Onde assistir?</span>                    
-                </div>
+                </div> */}
             </div>
-            
-            <Swiper
-            breakpoints={{
-              640: {
-                slidesPerView: 3,
-              },
-              1420: {
-                slidesPerView: 3,
-              },
-              1600: {
-                slidesPerView: 4,
-              }
-            }}
-            autoplay
-            navigation
-            loop={true}
-            modules={[Navigation, Pagination, Autoplay]}
-            className="flex flex-col w-[64rem]"
-          >
-            <SwiperSlide className=""><Actor img={fundo} title="Kin joon 1"/></SwiperSlide>
-            <SwiperSlide className=""><Actor img={fundo} title="Kin joon 1"/></SwiperSlide>
-            <SwiperSlide className=""><Actor img={fundo} title="Kin joon 1"/></SwiperSlide>
-            <SwiperSlide className=""><Actor img={fundo} title="Kin joon 1"/></SwiperSlide>
-            <SwiperSlide className=""><Actor img={fundo} title="Kin joon 1"/></SwiperSlide>
-            <SwiperSlide className=""><Actor img={fundo} title="Kin joon 1"/></SwiperSlide>
-            <SwiperSlide className=""><Actor img={fundo} title="Kin joon 1"/></SwiperSlide>
-          </Swiper>
         </div>
     </div>
   )
